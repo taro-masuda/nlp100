@@ -1,4 +1,4 @@
-
+import random
 
 def reverse_string(string: str) -> str:
     return string[::-1]
@@ -45,6 +45,16 @@ def cipher(string: str) -> str:
             crypted_str += char
     return crypted_str
 
+def typoglycemia(text: str) -> str:
+    word_list = text.split(' ')
+    for i, word in enumerate(word_list):
+        if len(word) > 4:
+            char_list = list(word)[1:-1]
+            random.shuffle(char_list)
+            word_list[i] = word[0] + ''.join(char_list) + word[-1]
+            
+    return ' '.join(word_list)
+
 if __name__ == '__main__':
     assert(reverse_string('stressed') == 'desserts')
     assert(concat_odd_chars('パタトクカシーー') == 'パトカー')
@@ -62,4 +72,5 @@ if __name__ == '__main__':
     assert(cipher(cipher('helloworld')) == 'helloworld')
     assert(cipher('!?#') == '!?#')
 
+    print(typoglycemia('I couldn’t believe that I could actually understand what I was reading : the phenomenal power of the human mind .'))
     print('All test cases passed.')
