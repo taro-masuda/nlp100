@@ -38,6 +38,35 @@ def generate_ngram(sequence, n: int) -> list:
         ngram.append(sequence[idx:idx + n])
     return ngram
 
+def generate_bigram_set(string: str) -> set:
+    bigrams = generate_ngram(list(string), n=2)
+    bigram_set = set()
+    for bigram in bigrams:
+        bigram_set.add(tuple(bigram))
+    return bigram_set
+
+def test_for_set_06() -> None:
+    str1 = 'paraparaparadise'
+    str2 = 'paragraph'
+    X = generate_bigram_set(str1)
+    print(X, type(X))
+    # assert X == {('p', 'a'), ('a', 'r'), ('r', 'a'), ('a', 'p'), 
+    #            ('a', 'd'), ('d', 'i'), ('i', 's'), ('s', 'e')}
+    Y = generate_bigram_set(str2)
+    print(Y)
+    # assert Y == {('p', 'a'), ('a', 'r'), ('r', 'a'), ('a', 'p'), 
+    #            ('a', 'g'), ('g', 'r'), ('p', 'h')}
+    print(X | Y)
+    # assert X | Y == {('p', 'a'), ('a', 'r'), ('r', 'a'), 
+    #            ('a', 'p'), ('a', 'd'), ('d', 'i'), ('i', 's'), ('s', 'e'),
+    #            ('a', 'g'), ('g', 'r'), ('p', 'h')}
+    print(X & Y)
+    # assert X & Y == {('p', 'a'), ('a', 'r'), ('r', 'a'), ('a', 'p')}
+    assert X - Y == {('a', 'd'), ('d', 'i'), ('i', 's'), ('s', 'e')}
+    assert Y - X == {('a', 'g'), ('g', 'r'), ('p', 'h')}
+    assert ('s', 'e') in X
+    assert ('s', 'e') not in Y
+
 def generate_template_text(x: int, y: str, z: float) -> str:
     return '{0}時の{1}は{2}'.format(x,y,z)
 
@@ -74,6 +103,8 @@ if __name__ == '__main__':
 
     assert generate_ngram('I am an NLPer'.split(' '), n=2) == [['I', 'am'], ['am', 'an'], ['an', 'NLPer']]
     assert generate_ngram(list('I am an NLPer'.replace(' ', '')), n=2) == [['I', 'a'], ['a', 'm'], ['m', 'a'], ['a', 'n'], ['n', 'N'], ['N', 'L'], ['L', 'P'], ['P', 'e'], ['e', 'r']]
+
+    test_for_set_06()
 
     assert generate_template_text(12, '気温', 22.4) == '12時の気温は22.4'
 
