@@ -32,6 +32,12 @@ def create_map_from_str_to_pos(text: str) -> dict:
             mp[word[0:2]] = idx + 1
     return mp
 
+def generate_ngram(sequence, n: int) -> list:
+    ngram = []
+    for idx in range(len(sequence) - n + 1):
+        ngram.append(sequence[idx:idx + n])
+    return ngram
+
 def generate_template_text(x: int, y: str, z: float) -> str:
     return '{0}時の{1}は{2}'.format(x,y,z)
 
@@ -65,6 +71,9 @@ if __name__ == '__main__':
 
     text = 'Hi He Lied Because Boron Could Not Oxidize Fluorine. New Nations Might Also Sign Peace Security Clause. Arthur King Can.'
     assert create_map_from_str_to_pos(text) == {'H': 1, 'He': 2, 'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'Ne': 10, 'Na': 11, 'Mi': 12, 'Al': 13, 'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'Ar': 18, 'K': 19, 'Ca': 20}
+
+    assert generate_ngram('I am an NLPer'.split(' '), n=2) == [['I', 'am'], ['am', 'an'], ['an', 'NLPer']]
+    assert generate_ngram(list('I am an NLPer'.replace(' ', '')), n=2) == [['I', 'a'], ['a', 'm'], ['m', 'a'], ['a', 'n'], ['n', 'N'], ['N', 'L'], ['L', 'P'], ['P', 'e'], ['e', 'r']]
 
     assert generate_template_text(12, '気温', 22.4) == '12時の気温は22.4'
 
