@@ -56,21 +56,21 @@ def typoglycemia(text: str) -> str:
     return ' '.join(word_list)
 
 if __name__ == '__main__':
-    assert(reverse_string('stressed') == 'desserts')
-    assert(concat_odd_chars('パタトクカシーー') == 'パトカー')
-    assert(concat_each_char_1by1('パトカー', 'タクシー') == 'パタトクカシーー')
+    assert reverse_string('stressed') == 'desserts'
+    assert concat_odd_chars('パタトクカシーー') == 'パトカー'
+    assert concat_each_char_1by1('パトカー', 'タクシー') == 'パタトクカシーー'
     
     text = 'Now I need a drink, alcoholic of course, after the heavy lectures involving quantum mechanics.'
-    assert(create_wordsize_list(text) == [3,1,4,1,5,9,2,6,5,3,5,8,9,7,9])
+    assert create_wordsize_list(text) == [3,1,4,1,5,9,2,6,5,3,5,8,9,7,9]
 
     text = 'Hi He Lied Because Boron Could Not Oxidize Fluorine. New Nations Might Also Sign Peace Security Clause. Arthur King Can.'
-    assert(create_map_from_str_to_pos(text) == {'H': 1, 'He': 2, 'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'Ne': 10, 'Na': 11, 'Mi': 12, 'Al': 13, 'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'Ar': 18, 'K': 19, 'Ca': 20})
+    assert create_map_from_str_to_pos(text) == {'H': 1, 'He': 2, 'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'Ne': 10, 'Na': 11, 'Mi': 12, 'Al': 13, 'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'Ar': 18, 'K': 19, 'Ca': 20}
 
-    assert(generate_template_text(12, '気温', 22.4) == '12時の気温は22.4')
+    assert generate_template_text(12, '気温', 22.4) == '12時の気温は22.4'
 
-    assert(cipher('abc!') == 'zyx!')
-    assert(cipher(cipher('helloworld')) == 'helloworld')
-    assert(cipher('!?#') == '!?#')
+    assert cipher('abc!') == 'zyx!'
+    assert cipher(cipher('helloworld')) == 'helloworld'
+    assert cipher('!?#') == '!?#'
 
     print(typoglycemia('I couldn’t believe that I could actually understand what I was reading : the phenomenal power of the human mind .'))
     print('All test cases passed.')
