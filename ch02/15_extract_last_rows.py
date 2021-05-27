@@ -17,7 +17,6 @@ if __name__ == '__main__':
     df = extract_first_rows(filepath=filepath_in, n_row=int(n_row))
     df.to_csv(filepath_out_py, sep='\t', index=False, header=False)
 
-    # head -n 10 ./data/popular-names.txt > ./data/popular-names-14-unix.txt
     with open (filepath_out_unix, 'w') as f:
         subprocess.run(["tail", "-n", n_row, filepath_in], stdout=f)
     assert filecmp.cmp(filepath_out_py, filepath_out_unix)
