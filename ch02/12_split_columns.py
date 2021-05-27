@@ -5,7 +5,7 @@ import pandas as pd
 def extract_col(idx_col: int, filepath_in: str) -> str:
     df = pd.read_table(filepath_in, header=None)
     df_1col = df.iloc[:, idx_col]
-    filepath_out = filepath_in.replace('.txt', 'col' + str(idx_col+1) + '.txt')
+    filepath_out = filepath_in.replace('popular-names.txt', 'col' + str(idx_col+1) + '.txt')
     df_1col.to_csv(filepath_out, index=False, header=None)
     return filepath_out
 
