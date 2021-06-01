@@ -19,7 +19,7 @@ class FeatureExtractor:
                             is_test: bool, 
                             filepath: str) -> None:
         array = self.extract_features(df, is_test=is_test)
-        np.save(file=filepath, arr=array)
+        np.save(file=filepath, arr=array, allow_pickle=True)
 
 if __name__ == '__main__':
     

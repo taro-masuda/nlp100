@@ -4,8 +4,9 @@ from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 import random
 import os
+import pickle
 
-def preprocess_label(label_path: str) -> (np.array, preprocessing.LabelEncoder):
+def preprocess_label(label_path: str):
     df = pd.read_csv(label_path, sep='\t')
     le = preprocessing.LabelEncoder()
     le.fit(df['category'])
@@ -18,10 +19,12 @@ def train(x_train: np.array, y: np.array) -> LogisticRegression:
 if __name__ == '__main__':
     label_path = './data/train.txt'
     train_path = './data/train_features.npy'
+    model_path = './data/model_logisticregression.pickle'
     y, le = preprocess_label(label_path=label_path)
-    x_train = np.load(file=train_path)
-    clf = train(x_train=x_train, y=y)
     
+    with open(model_path, 'rb') as f:
+        clf = pickle.load(f)
+
     val_path = './data/val_features.npy'
     x_val = np.load(file=val_path)
     cl_label = clf.predict(x_val)
