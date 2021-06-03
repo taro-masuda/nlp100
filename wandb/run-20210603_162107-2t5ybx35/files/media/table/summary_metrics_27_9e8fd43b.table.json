@@ -1,0 +1,1 @@
+{"columns": ["metric_name", "metric_value", "model_name"], "data": [["accuracy_score", 0.84, "LogisticRegression"], ["precision", 0.85, "LogisticRegression"], ["recall", 0.84, "LogisticRegression"], ["f1_score", 0.81, "LogisticRegression"]]}

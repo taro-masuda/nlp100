@@ -1,0 +1,22 @@
+{
+    "os": "Darwin-19.6.0-x86_64-i386-64bit",
+    "python": "3.6.8",
+    "heartbeatAt": "2021-06-03T08:26:54.912537",
+    "startedAt": "2021-06-03T08:26:50.730165",
+    "docker": null,
+    "cpu_count": 8,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "ch06/59_explore_hyperparams.py",
+    "codePath": "ch06/59_explore_hyperparams.py",
+    "git": {
+        "remote": "https://github.com/taro-masuda/nlp100",
+        "commit": "439869aec32288712c125fdcd59656bb2e2a6acb"
+    },
+    "email": "taro.masuda.jp@gmail.com",
+    "root": "/Users/taromasuda/work/05_tech/01_ML/nlp100",
+    "host": "TaronoMacBook-Pro.local",
+    "username": "taromasuda",
+    "executable": "/Users/taromasuda/work/05_tech/01_ML/nlp/bin/python"
+}

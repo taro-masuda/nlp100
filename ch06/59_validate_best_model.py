@@ -7,7 +7,19 @@ import os
 import pickle
 from typing import Union
 from sklearn.metrics import accuracy_score
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.ensemble import RandomForestClassifier
 import matplotlib.pyplot as plt
+import wandb
+import xgboost as xgb
+
+def seed_everything(seed=42):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
 
 def preprocess_label(label_path: str) -> Union[np.array, preprocessing.LabelEncoder]:
     df = pd.read_csv(label_path, sep='\t')
@@ -15,11 +27,24 @@ def preprocess_label(label_path: str) -> Union[np.array, preprocessing.LabelEnco
     le.fit(df['category'])
     return le.transform(df['category']), le
 
-def train(x_train: np.array, y: np.array, C: float) -> LogisticRegression:
-    clf = LogisticRegression(C=C).fit(x_train, y)
+def train(x_train: np.array, y: np.array, C: float,
+            model_type: str):
+    if model_type == 'LR':
+        clf = LogisticRegression(C=C).fit(x_train, y)
+    elif model_type == 'NB':
+        clf = MultinomialNB(alpha=C).fit(x_train, y)
+    elif model_type == 'RF':
+        clf = RandomForestClassifier(n_estimators=int(C*100))
+        clf.fit(x_train, y)
+    else:
+        raise ValueError
     return clf
 
 if __name__ == '__main__':
+    seed_everything()
+
+    # wandb.init(project='visualize-sklearn')
+    
     label_path = './data/train.txt'
     train_path = './data/train_features.npy'
     model_path = './data/model_logisticregression.pickle'
@@ -46,28 +71,15 @@ if __name__ == '__main__':
     y_true_val = le.transform(df_val['category'])
     y_true_test = le.transform(df_test['category'])
 
-    acc_tr, acc_val, acc_test = [], [], []
-    for C in reguralization_parameters:
-        clf = train(x_train=x_train, y=y, C=C)
-        
-        y_pred = clf.predict(x_train)
-        acc_tr.append(accuracy_score(y_true_train, y_pred))        
+    model_type = 'NB' #['NB', 'LR', 'SVC'] # LogisticRegression, SupportVectorClassifier, NaiveBayes
+    C = 0.01
 
-        y_pred = clf.predict(x_val)
-        acc_val.append(accuracy_score(y_true_val, y_pred))        
-
-        y_pred = clf.predict(x_test)
-        acc_test.append(accuracy_score(y_true_test, y_pred))        
-
-    plt.plot(reguralization_parameters, acc_tr, 
-            color='blue', marker='o', label='train')
-    plt.plot(reguralization_parameters, acc_val, 
-            color='green', marker='+', label='val')
-    plt.plot(reguralization_parameters, acc_test, 
-            color='red', marker='^', label='test')
+    clf = train(x_train=x_train, y=y, C=C, model_type=model_type)
+            
+    y_pred = clf.predict(x_test)
+    acc = accuracy_score(y_true_test, y_pred)
     
-    plt.xlabel('Regularization parameter C')
-    plt.ylabel('Accuracy')
-    plt.legend(bbox_to_anchor=(1, 0), loc='lower right', borderaxespad=1)
-
-    plt.savefig(fig_path)
+    print(acc, model_type, C)
+    '''
+    0.9100449775112444 NB 0.01
+    '''
