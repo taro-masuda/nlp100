@@ -1,6 +1,7 @@
 # custom
 *.npy
 data/GoogleNews-*.bin*
+data/__MAXOSX
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
