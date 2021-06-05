@@ -17,7 +17,7 @@ if __name__ == '__main__':
     filepath = './data/GoogleNews-vectors-negative300.bin'
 
     word_embedding = WordEmbedding()
-    model = word_embedding.load_dataset(filepath)
+    word_embedding.load_dataset(filepath)
 
     print(word_embedding.model["United_States"])
     '''
