@@ -25,7 +25,7 @@ if __name__ == "__main__":
         country_set.add(country.name.replace(' ', '_'))
 
     ndim = word_embedding.model["United_States"].shape[0]
-    X = np.empty(shape=(1, ndim))
+    X = np.empty(shape=(0, ndim))
     for word in country_set:
         if word in word_embedding.model:
             vector = word_embedding.model[word]
