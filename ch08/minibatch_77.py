@@ -80,9 +80,12 @@ def train(BATCH_SIZE=None, EPOCH=None):
             loss = criterion(y_pred, y_tr)
             loss.backward()
             optimizer.step()
-            tr_loss.append(loss.item())
-            acc = calc_acc(y_pred, y_tr)
-            tr_acc.append(acc)
+        
+        y_pred = net.forward(x_train)
+        loss = criterion(y_pred, y_tr_label)
+        tr_loss.append(loss.item())
+        acc = calc_acc(y_pred, y_tr_label)
+        tr_acc.append(acc)
 
         torch.save(
             {

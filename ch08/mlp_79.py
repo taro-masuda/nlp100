@@ -4,14 +4,41 @@ import random
 import numpy as np
 from torch import nn
 import torch.optim as optim
-from single_layer_predict_71 import seed_everything, Net
+from single_layer_predict_71 import seed_everything
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 import time
 
-def calc_acc(tensor_pred, tensor_label: torch.tensor) -> float:
+class Net(nn.Module):
+    def __init__(self, in_shape: int, out_shape: int):
+        super().__init__()
+        self.fc1 = nn.Linear(in_shape, 128, bias=True)
+        self.dropout1 = nn.Dropout(0.5)
+        self.bn1 = nn.BatchNorm1d(128, affine=True)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(128, 128, bias=True)
+        self.dropout2 = nn.Dropout(0.5)
+        self.bn2 = nn.BatchNorm1d(128, affine=True)
+        self.fc3 = nn.Linear(128, out_shape, bias=True)
+        self.softmax = nn.Softmax(dim=1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.dropout1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.dropout2(x)
+        x = self.bn2(x)
+        x = self.relu(x)
+        x = self.fc3(x)
+        x = self.softmax(x)
+        return x
+
+def calc_acc(tensor_pred: torch.tensor, tensor_label: torch.tensor) -> float:
     y_te_pred = torch.argmax(tensor_pred, dim=1)
     y_label = torch.argmax(tensor_label, dim=1)
+    
     acc = (y_te_pred == y_label).sum().item() / y_label.shape[0]
   
     assert acc >= 0 and acc <= 1
@@ -36,8 +63,8 @@ def train(BATCH_SIZE=None, EPOCH=None):
     ckpt_dir = './data/checkpoint/'
     if not os.path.exists(ckpt_dir):
         os.mkdir(ckpt_dir)
-    modelpath = os.path.join(ckpt_dir, 'torch_single_layer_77.pth')
-    figpath ='./data/torch_training_77.png'
+    modelpath = os.path.join(ckpt_dir, 'torch_single_layer_79.pth')
+    figpath ='./data/torch_training_79.png'
 
     train_path = os.path.join(filedir_in, 'train.pt')
     x_train = torch.load(train_path).to(device)
@@ -82,12 +109,18 @@ def train(BATCH_SIZE=None, EPOCH=None):
             loss = criterion(y_pred, y_tr)
             loss.backward()
             optimizer.step()
-        
+
         y_pred = net.forward(x_train)
         loss = criterion(y_pred, y_tr_label)
         tr_loss.append(loss.item())
         acc = calc_acc(y_pred, y_tr_label)
         tr_acc.append(acc)
+
+        if epoch % 10 == 0:
+            plt.subplot(2,1,1)
+            plt.scatter(epoch, loss.item(), color='blue', label='tr')
+            plt.subplot(2,1,2)
+            plt.scatter(epoch, acc, color='blue', label='tr')
         '''
         torch.save(
             {
@@ -100,10 +133,6 @@ def train(BATCH_SIZE=None, EPOCH=None):
                 '_epoch' + str(epoch).zfill(3) + '.pth'))
         
 
-        plt.subplot(2,1,1)
-        plt.scatter(epoch, loss.item(), color='blue', label='tr')
-        plt.subplot(2,1,2)
-        plt.scatter(epoch, acc, color='blue', label='tr')
         '''
         
         y_pred = net.forward(x_val)
@@ -112,19 +141,18 @@ def train(BATCH_SIZE=None, EPOCH=None):
         acc = calc_acc(y_pred, y_val_label)
         val_acc.append(acc)
 
-        '''
-        plt.subplot(2,1,1)
-        plt.scatter(epoch, loss.item(), color='red', label='val')
-        plt.subplot(2,1,2)
-        plt.scatter(epoch, acc, color='red', label='val')
-        '''
+        
+        if epoch % 10 == 0:
+            plt.subplot(2,1,1)
+            plt.scatter(epoch, loss.item(), color='red', label='val')
+            plt.subplot(2,1,2)
+            plt.scatter(epoch, acc, color='red', label='val')
+
+            # print(tr_loss[-1], tr_acc[-1], val_loss[-1], val_acc[-1])
+
     print('Time per epoch:', 
         '{:.4f}[s]'.format((time.time() - start_time)/EPOCH),
         'Batch Size B =', BATCH_SIZE)
-    plt.subplot(2,1,1)
-    plt.legend()
-    plt.subplot(2,1,2)
-    plt.legend()
     torch.save(net.state_dict(), modelpath)
     plt.savefig(figpath)
     
@@ -142,11 +170,4 @@ if __name__ == "__main__":
     |                               |                      |                  N/A |
     +-------------------------------+----------------------+----------------------+
     '''
-    if not torch.cuda.is_available():
-        print('This script is only for GPU machines. The script will quit.')
-        exit()
-    train(BATCH_SIZE=16, EPOCH=100) # Time per epoch: 0.5104[s] Batch Size B = 16
-    train(BATCH_SIZE=8, EPOCH=100) # Time per epoch: 0.9829[s] Batch Size B = 8
-    train(BATCH_SIZE=4, EPOCH=100) # Time per epoch: 1.9127[s] Batch Size B = 4
-    train(BATCH_SIZE=2, EPOCH=100) # Time per epoch: 3.7390[s] Batch Size B = 2
-    train(BATCH_SIZE=1, EPOCH=100) # Time per epoch: 7.4652[s] Batch Size B = 1
+    train(BATCH_SIZE=256, EPOCH=200) # 0.4107946026986507
