@@ -3,26 +3,7 @@ import os
 import random
 import numpy as np
 from torch import nn
-
-def seed_everything(seed=42):
-    random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = True
-
-class Net(nn.Module):
-    def __init__(self, in_shape: int, out_shape: int):
-        super().__init__()
-        self.fc = nn.Linear(300, 4, bias=True)
-        nn.init.constant_(self.fc.bias.data, 0)
-        self.softmax = nn.Softmax(dim=1)
-
-    def forward(self, x):
-        x = self.fc(x)
-        x = self.softmax(x)
-        return x
+from single_layer_predict_71 import seed_everything, Net
 
 if __name__ == "__main__":
     seed_everything()
