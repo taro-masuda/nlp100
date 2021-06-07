@@ -32,20 +32,27 @@ if __name__ == "__main__":
     x_train = torch.load(train_path)
 
     net = Net(in_shape=x_train.shape[1], out_shape=4)
-    
-    assert torch.equal(net.fc(torch.zeros_like(x_train)) \
-        , torch.zeros(x_train.shape[0], 4))
-    output = net.forward(x_train)
+    y_pred = net.forward(x_train)
 
-    print(output[0, :])
-    print(output[0:4, :])
-    print(output.shape)
+    train_label_path = os.path.join(filedir_in, 'train_label.pt')
+    y_label = torch.load(train_label_path)
+    y_label = torch.nn.functional.one_hot(y_label).to(torch.float)
+    
+    loss = nn.BCELoss()
+    output = loss(y_pred, y_label)
+    print(output)
+    output.backward()
+    print(net.fc.weight.grad)
+    assert net.fc.weight.grad.shape == net.fc.weight.shape
     '''
-    tensor([0.2500, 0.2500, 0.2500, 0.2500], grad_fn=<SliceBackward>)
-    tensor([[0.2500, 0.2500, 0.2500, 0.2500],
-            [0.2500, 0.2500, 0.2500, 0.2500],
-            [0.2500, 0.2500, 0.2500, 0.2500],
-            [0.2500, 0.2500, 0.2500, 0.2500]], grad_fn=<SliceBackward>)
-    torch.Size([10672, 4])
+    tensor(0.5623, grad_fn=<BinaryCrossEntropyBackward>)
+    tensor([[ 2.1097e-06, -1.6584e-06, -4.6904e-07,  ..., -1.1038e-06,
+          1.3178e-06,  3.3685e-06],
+        [-7.4744e-07,  5.0572e-07,  1.3389e-07,  ...,  4.3032e-07,
+         -4.4466e-07, -1.1497e-06],
+        [-7.0701e-07,  5.9917e-07,  1.7039e-07,  ...,  3.5053e-07,
+         -4.5378e-07, -1.1540e-06],
+        [-6.5526e-07,  5.5355e-07,  1.6476e-07,  ...,  3.2295e-07,
+         -4.1934e-07, -1.0648e-06]])
     '''
     
