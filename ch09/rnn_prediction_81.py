@@ -104,14 +104,8 @@ if __name__ == '__main__':
             n_vocab=len(dic))
     output, h_T = net.forward(x_train, h_0=torch.zeros(1, batch_size, hidden_size))
     print(output.shape)
-    print(output[:, 0])
+    print(output[-1, 0, :])
     '''
     torch.Size([419, 10672, 4])
-    tensor([[0.2808, 0.3416, 0.1282, 0.2495],
-            [0.2233, 0.2969, 0.1994, 0.2803],
-            [0.2035, 0.1787, 0.1803, 0.4375],
-            ...,
-            [0.1590, 0.3011, 0.2402, 0.2997],
-            [0.1590, 0.3011, 0.2402, 0.2997],
-            [0.1590, 0.3011, 0.2402, 0.2997]], grad_fn=<SelectBackward>)
+    tensor([0.1590, 0.3011, 0.2402, 0.2997], grad_fn=<SliceBackward>)
     '''
