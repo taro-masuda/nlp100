@@ -27,7 +27,7 @@ class RNNEmbedding(nn.Module):
         self.embedding = nn.Embedding(n_vocab, input_size)
         self.rnn = nn.RNN(input_size=input_size,
                         hidden_size=hidden_size,
-                        num_layers=2,
+                        num_layers=1,
                         nonlinearity='tanh',
                         bias=True,
                         bidirectional=True)
@@ -127,7 +127,7 @@ def train(config: dict):
             #print(x_tr.shape)
             optimizer.zero_grad()
             x_tr = x_tr.permute(1, 0, 2)
-            output, h_T = net.forward(x=x_tr, h_0=torch.zeros(2*2, x_tr.shape[1], hidden_size).to(device))
+            output, h_T = net.forward(x=x_tr, h_0=torch.zeros(2, x_tr.shape[1], hidden_size).to(device))
             y_pred = output[-1, :, :]
             loss = criterion(y_pred, y_tr)
             tr_loss = loss.item()
@@ -135,13 +135,13 @@ def train(config: dict):
             loss.backward()
             optimizer.step()
 
-        output, h_T = net.forward(x_train, h_0=torch.zeros(2*2, x_train.shape[1], hidden_size).to(device))
+        output, h_T = net.forward(x_train, h_0=torch.zeros(2, x_train.shape[1], hidden_size).to(device))
         y_pred = output[-1, :, :]
         loss = criterion(y_pred, y_tr_label)
         tr_loss = loss.item()
         tr_acc = calc_acc(y_pred, y_tr_label)
 
-        output, h_T = net.forward(x=x_val, h_0=torch.zeros(2*2, batch_size_val, hidden_size).to(device))
+        output, h_T = net.forward(x=x_val, h_0=torch.zeros(2, batch_size_val, hidden_size).to(device))
         y_pred = output[-1, :, :]
         loss = criterion(y_pred, y_val_label)
         val_loss = loss.item()
@@ -167,15 +167,15 @@ if __name__ == '__main__':
     }
     train(config=config)
     '''
-    epoch: 1, tr_loss: 0.5087, tr_acc: 0.4252, val_loss: 0.5155, val_acc: 0.4040
-    epoch: 2, tr_loss: 0.4930, tr_acc: 0.4252, val_loss: 0.4994, val_acc: 0.4040
-    epoch: 3, tr_loss: 0.4901, tr_acc: 0.4252, val_loss: 0.4967, val_acc: 0.4040
-    epoch: 4, tr_loss: 0.4887, tr_acc: 0.4252, val_loss: 0.4959, val_acc: 0.4040
-    epoch: 5, tr_loss: 0.4882, tr_acc: 0.4252, val_loss: 0.4956, val_acc: 0.4040
-    epoch: 6, tr_loss: 0.4885, tr_acc: 0.4252, val_loss: 0.4957, val_acc: 0.4040
-    epoch: 7, tr_loss: 0.4882, tr_acc: 0.4252, val_loss: 0.4956, val_acc: 0.4040
-    epoch: 8, tr_loss: 0.4879, tr_acc: 0.4252, val_loss: 0.4956, val_acc: 0.4040
-    epoch: 9, tr_loss: 0.4881, tr_acc: 0.4252, val_loss: 0.4956, val_acc: 0.4040
-    epoch: 10, tr_loss: 0.4879, tr_acc: 0.4252, val_loss: 0.4956, val_acc: 0.4040
-    Time per epoch:  12.499901485443115 [s]
+    epoch: 1, tr_loss: 0.5137, tr_acc: 0.4252, val_loss: 0.5179, val_acc: 0.4040
+    epoch: 2, tr_loss: 0.4935, tr_acc: 0.4252, val_loss: 0.4995, val_acc: 0.4040
+    epoch: 3, tr_loss: 0.4896, tr_acc: 0.4252, val_loss: 0.4965, val_acc: 0.4040
+    epoch: 4, tr_loss: 0.4887, tr_acc: 0.4252, val_loss: 0.4963, val_acc: 0.4040
+    epoch: 5, tr_loss: 0.4883, tr_acc: 0.4252, val_loss: 0.4954, val_acc: 0.4040
+    epoch: 6, tr_loss: 0.4879, tr_acc: 0.4252, val_loss: 0.4955, val_acc: 0.4040
+    epoch: 7, tr_loss: 0.4884, tr_acc: 0.4252, val_loss: 0.4970, val_acc: 0.4040
+    epoch: 8, tr_loss: 0.4879, tr_acc: 0.4252, val_loss: 0.4954, val_acc: 0.4040
+    epoch: 9, tr_loss: 0.4885, tr_acc: 0.3962, val_loss: 0.4956, val_acc: 0.4018
+    epoch: 10, tr_loss: 0.4884, tr_acc: 0.4252, val_loss: 0.4969, val_acc: 0.4040
+    Time per epoch:  6.155557560920715 [s]
     '''
