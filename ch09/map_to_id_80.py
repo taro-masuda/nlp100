@@ -3,6 +3,7 @@ from gensim.models.keyedvectors import KeyedVectors
 import texthero as hero
 import sklearn
 import pandas as pd
+import torch
 
 def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     custom_pipeline = [
@@ -35,6 +36,11 @@ class IDMapping:
             else:
                 self.dic[key] = idx
                 idx += 1
+
+    def make_feature_pipeline(self, df: pd.DataFrame) -> torch.tensor:
+        df['clean_title'] = self.preprocess(df)
+        titles = df['clean_title'].tolist()
+        return self.make_tensor(titles)
 
 if __name__ == '__main__':
     train_path = './data/train.txt'
