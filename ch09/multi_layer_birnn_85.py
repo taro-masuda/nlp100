@@ -9,7 +9,7 @@ from torch.utils.data import Dataset, DataLoader
 import time
 from gensim.models.keyedvectors import KeyedVectors
 import numpy as np
-
+'''
 def calc_acc(tensor_pred, tensor_label: torch.tensor) -> float:
     y_te_pred = torch.argmax(tensor_pred, dim=1)
     y_label = torch.argmax(tensor_label, dim=1)
@@ -18,7 +18,24 @@ def calc_acc(tensor_pred, tensor_label: torch.tensor) -> float:
     assert acc >= 0 and acc <= 1
     return acc
 
-class RNNEmbedding(RNN):
+class RNNEmbedding(nn.Module):
+    def __init__(self, input_size: int, 
+                hidden_size: int, 
+                output_size: int,
+                n_vocab: int):
+        super().__init__()
+        self.embedding = nn.Embedding(n_vocab, input_size)
+        self.rnn = nn.RNN(input_size=input_size,
+                        hidden_size=hidden_size,
+                        num_layers=1,
+                        nonlinearity='tanh',
+                        bias=True,
+                        bidirectional=True)
+        self.fc = nn.Linear(in_features=2*hidden_size,
+                        out_features=output_size,
+                        bias=True)
+        self.softmax = nn.Softmax(dim=2)
+
     def forward(self, x: torch.tensor, h_0: torch.tensor):
         x, h_T = self.rnn(x, h_0)
         x = self.fc(x)
@@ -106,7 +123,7 @@ def train(config: dict):
             #print(x_tr.shape)
             optimizer.zero_grad()
             x_tr = x_tr.permute(1, 0, 2)
-            output, h_T = net.forward(x=x_tr, h_0=torch.zeros(1, x_tr.shape[1], hidden_size).to(device))
+            output, h_T = net.forward(x=x_tr, h_0=torch.zeros(2, x_tr.shape[1], hidden_size).to(device))
             y_pred = output[-1, :, :]
             loss = criterion(y_pred, y_tr)
             tr_loss = loss.item()
@@ -114,13 +131,13 @@ def train(config: dict):
             loss.backward()
             optimizer.step()
 
-        output, h_T = net.forward(x_train, h_0=torch.zeros(1, x_train.shape[1], hidden_size).to(device))
+        output, h_T = net.forward(x_train, h_0=torch.zeros(2, x_train.shape[1], hidden_size).to(device))
         y_pred = output[-1, :, :]
         loss = criterion(y_pred, y_tr_label)
         tr_loss = loss.item()
         tr_acc = calc_acc(y_pred, y_tr_label)
 
-        output, h_T = net.forward(x=x_val, h_0=torch.zeros(1, batch_size_val, hidden_size).to(device))
+        output, h_T = net.forward(x=x_val, h_0=torch.zeros(2, batch_size_val, hidden_size).to(device))
         y_pred = output[-1, :, :]
         loss = criterion(y_pred, y_val_label)
         val_loss = loss.item()
@@ -138,15 +155,10 @@ def train(config: dict):
 
 if __name__ == '__main__':
     config = {
-        'epoch': 100,
+        'epoch': 10,
         'batch_size': 32,
     }
     train(config=config)
-    '''
-    epoch: 1, tr_loss: 0.5687, tr_acc: 0.4252, val_loss: 0.5694, val_acc: 0.4040
-    .
-    .
-    .
-    epoch: 100, tr_loss: 0.4880, tr_acc: 0.4253, val_loss: 0.4954, val_acc: 0.4040
-    Time per epoch:  0.2349664044380188 [s]
-    '''
+
+    
+'''
