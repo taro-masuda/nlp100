@@ -4,7 +4,7 @@ import torch.optim as optim
 import pandas as pd
 import os
 from map_to_id_80 import IDMapping
-from rnn_prediction_81 import seed_everything, FeatureExtractor, RNN
+from rnn_prediction_81 import seed_everything, FeatureExtractor
 from torch.utils.data import Dataset, DataLoader
 import time
 from gensim.models.keyedvectors import KeyedVectors
@@ -18,29 +18,35 @@ def calc_acc(tensor_pred, tensor_label: torch.tensor) -> float:
     assert acc >= 0 and acc <= 1
     return acc
 
-class RNNEmbedding(nn.Module):
-    def __init__(self, input_size: int, 
-                hidden_size: int, 
+class CNN(nn.Module):
+    def __init__(self, in_channels: int, out_channels: int,
                 output_size: int,
-                n_vocab: int):
+                seq_len: int):
         super().__init__()
-        self.embedding = nn.Embedding(n_vocab, input_size)
-        self.rnn = nn.RNN(input_size=input_size,
-                        hidden_size=hidden_size,
-                        num_layers=1,
-                        nonlinearity='tanh',
-                        bias=True,
-                        bidirectional=True)
-        self.fc = nn.Linear(in_features=2*hidden_size,
+        self.conv1d = nn.Conv1d(in_channels=in_channels,
+                                out_channels=out_channels,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1,
+                                padding_mode='zeros'
+                                )
+        self.pool1d = nn.MaxPool1d(kernel_size=3, stride=seq_len, padding=0)
+        self.fc = nn.Linear(
+                        in_features=in_channels,
                         out_features=output_size,
                         bias=True)
-        self.softmax = nn.Softmax(dim=2)
-
-    def forward(self, x: torch.tensor, h_0: torch.tensor):
-        x, h_T = self.rnn(x, h_0)
-        x = self.fc(x)
-        x = self.softmax(x)
-        return x, h_T
+        self.softmax = nn.Softmax(dim=1)
+        
+    def forward(self, x: torch.tensor):
+        N = x.shape[0]
+        x = self.conv1d(x)
+        x = self.pool1d(x) # N(samples) x C(n_dim(300)) x 1
+        x = torch.squeeze(x) # N x C(n_dim) 
+        x = x.reshape([N, -1])
+        x = self.fc(x) # N x 4
+        #print(x.shape)
+        x = self.softmax(x) # 1 x 4
+        return x
 
 class WordEmbeddingExtractor(FeatureExtractor):
     def __init__(self, filepath):
@@ -56,8 +62,9 @@ class WordEmbeddingExtractor(FeatureExtractor):
                     l.append(self.word_vector[word][:50])
                 else:
                     l.append(np.zeros(50,))
-            X.append(torch.tensor(l, dtype=torch.float)) # n_samples x seq_len x
+            X.append(torch.tensor(l, dtype=torch.float)) # n_samples x seq_len x n_dim
         X = nn.utils.rnn.pad_sequence(X)
+        X = X.permute(1, 2, 0) # n_samples(N) x n_dim(Cin) x seq_len(L)
         return X    
 
 class TextDataset(Dataset):
@@ -69,7 +76,7 @@ class TextDataset(Dataset):
         return len(self.X)
 
     def __getitem__(self, idx):
-        return self.X[:, idx], self.y[idx]
+        return self.X[idx], self.y[idx]
 
 def train(config: dict):
     if torch.cuda.is_available():
@@ -92,7 +99,6 @@ def train(config: dict):
     y_val_label = torch.load(val_label_path).to(device)
     y_val_label = torch.nn.functional.one_hot(y_val_label).to(torch.float)
 
-    hidden_size = config['hidden_size']
     input_size = config['input_size']
     output_size = config['output_size']
 
@@ -111,10 +117,10 @@ def train(config: dict):
     dataset = TextDataset(X=x_train, y=y_tr_label)
     dataloader = DataLoader(dataset, batch_size=config['batch_size'], shuffle=True)
 
-    net = RNNEmbedding(input_size=input_size, 
-            hidden_size=hidden_size,
-            output_size=output_size,
-            n_vocab=len(dic)).to(device)
+    #print(x_train.shape)
+    net = CNN(in_channels=x_train.shape[1], out_channels=x_train.shape[1],
+                output_size=config['output_size'],
+                seq_len=x_train.shape[2]).to(device)
 
     criterion = nn.BCELoss()
     optimizer = optim.SGD(net.parameters(),
@@ -125,24 +131,26 @@ def train(config: dict):
     for epoch in range(config['epoch']):
         for x_tr, y_tr in dataloader:
             #print(x_tr.shape)
+            y_tr = y_tr.reshape([config['batch_size'], config['output_size']])
+            #print(y_tr.shape)
             optimizer.zero_grad()
-            x_tr = x_tr.permute(1, 0, 2)
-            output, h_T = net.forward(x=x_tr, h_0=torch.zeros(2, x_tr.shape[1], hidden_size).to(device))
-            y_pred = output[-1, :, :]
+            output = net.forward(x=x_tr).to(device)
+            y_pred = output
+            y_pred = y_pred.reshape([config['batch_size'], config['output_size']])
             loss = criterion(y_pred, y_tr)
             tr_loss = loss.item()
             tr_acc = calc_acc(y_pred, y_tr)
             loss.backward()
             optimizer.step()
 
-        output, h_T = net.forward(x_train, h_0=torch.zeros(2, x_train.shape[1], hidden_size).to(device))
-        y_pred = output[-1, :, :]
+        output = net.forward(x_train).to(device)
+        y_pred = output
         loss = criterion(y_pred, y_tr_label)
         tr_loss = loss.item()
         tr_acc = calc_acc(y_pred, y_tr_label)
 
-        output, h_T = net.forward(x=x_val, h_0=torch.zeros(2, batch_size_val, hidden_size).to(device))
-        y_pred = output[-1, :, :]
+        output = net.forward(x=x_val).to(device)
+        y_pred = output
         loss = criterion(y_pred, y_val_label)
         val_loss = loss.item()
         val_acc = calc_acc(y_pred, y_val_label)
@@ -161,21 +169,20 @@ if __name__ == '__main__':
     config = {
         'epoch': 10,
         'batch_size': 1,
-        'hidden_size': 2,
         'input_size': 50,
         'output_size': 4
     }
     train(config=config)
     '''
-    epoch: 1, tr_loss: 0.5137, tr_acc: 0.4252, val_loss: 0.5179, val_acc: 0.4040
-    epoch: 2, tr_loss: 0.4935, tr_acc: 0.4252, val_loss: 0.4995, val_acc: 0.4040
-    epoch: 3, tr_loss: 0.4896, tr_acc: 0.4252, val_loss: 0.4965, val_acc: 0.4040
-    epoch: 4, tr_loss: 0.4887, tr_acc: 0.4252, val_loss: 0.4963, val_acc: 0.4040
-    epoch: 5, tr_loss: 0.4883, tr_acc: 0.4252, val_loss: 0.4954, val_acc: 0.4040
-    epoch: 6, tr_loss: 0.4879, tr_acc: 0.4252, val_loss: 0.4955, val_acc: 0.4040
-    epoch: 7, tr_loss: 0.4884, tr_acc: 0.4252, val_loss: 0.4970, val_acc: 0.4040
-    epoch: 8, tr_loss: 0.4879, tr_acc: 0.4252, val_loss: 0.4954, val_acc: 0.4040
-    epoch: 9, tr_loss: 0.4885, tr_acc: 0.3962, val_loss: 0.4956, val_acc: 0.4018
-    epoch: 10, tr_loss: 0.4884, tr_acc: 0.4252, val_loss: 0.4969, val_acc: 0.4040
-    Time per epoch:  6.155557560920715 [s]
+    epoch: 1, tr_loss: 0.3490, tr_acc: 0.6968, val_loss: 0.3617, val_acc: 0.6904
+    epoch: 2, tr_loss: 0.3186, tr_acc: 0.7212, val_loss: 0.3361, val_acc: 0.7009
+    epoch: 3, tr_loss: 0.2984, tr_acc: 0.7477, val_loss: 0.3226, val_acc: 0.7219
+    epoch: 4, tr_loss: 0.2840, tr_acc: 0.7647, val_loss: 0.3109, val_acc: 0.7301
+    epoch: 5, tr_loss: 0.2730, tr_acc: 0.7749, val_loss: 0.3104, val_acc: 0.7451
+    epoch: 6, tr_loss: 0.2572, tr_acc: 0.7915, val_loss: 0.2974, val_acc: 0.7594
+    epoch: 7, tr_loss: 0.2478, tr_acc: 0.8022, val_loss: 0.2942, val_acc: 0.7624
+    epoch: 8, tr_loss: 0.2362, tr_acc: 0.8097, val_loss: 0.2879, val_acc: 0.7571
+    epoch: 9, tr_loss: 0.2275, tr_acc: 0.8213, val_loss: 0.2872, val_acc: 0.7594
+    epoch: 10, tr_loss: 0.2246, tr_acc: 0.8289, val_loss: 0.2868, val_acc: 0.7654
+    Time per epoch:  15.283681416511536 [s]
     '''
