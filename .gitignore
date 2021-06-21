@@ -3,6 +3,7 @@
 data/GoogleNews-*.bin*
 data/__MAXOSX
 data/checkpoint/*.pth
+data/kftt-data-1.0/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
