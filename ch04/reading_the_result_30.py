@@ -25,8 +25,8 @@ def load_morpho_dict_list(resultpath: str) -> list:
             dic['surface'] = surface
             rests = rests.split(',')
             dic['base'] = rests[-3]
-            dic['pos'] = rests[1]
-            dic['pos1'] = rests[2]
+            dic['pos'] = rests[0]
+            dic['pos1'] = rests[1]
             l.append(dic)
             if dic['surface'] == '。':
                 dict_list.append(l)
@@ -47,19 +47,16 @@ if __name__ == '__main__':
     dic_list = load_morpho_dict_list(resultpath=resultpath)
     print(dic_list)
     '''
-    [[{'surface': '一', 'base': '一', 'pos': '数', 'pos1': '*'}, 
-    {'surface': '\u3000', 'base': '\u3000', 'pos': '空白', 'pos1': '*'}, 
-    {'surface': '吾輩', 'base': '吾輩', 'pos': '代名詞', 'pos1': '一般'}, 
-    {'surface': 'は', 'base': 'は', 'pos': '係助詞', 'pos1': '*'}, 
-    {'surface': '猫', 'base': '猫', 'pos': '一般', 'pos1': '*'}, 
-    {'surface': 'で', 'base': 'だ', 'pos': '*', 'pos1': '*'}, 
-    {'surface': 'ある', 'base': 'ある', 'pos': '*', 'pos1': '*'}, 
-    {'surface': '。', 'base': '。', 'pos': '句点', 'pos1': '*'}], 
-    [{'surface': '名前', 'base': '名前', 'pos': '一般', 'pos1': '*'}, 
-    {'surface': 'は', 'base': 'は', 'pos': '係助詞', 'pos1': '*'}, 
-    {'surface': 'まだ', 'base': 'まだ', 'pos': '助詞類接続', 'pos1': '*'}, 
-    {'surface': '無い', 'base': '無い', 'pos': '自立', 'pos1': '*'}, 
-    {'surface': '。', 'base': '。', 'pos': '句点', 'pos1': '*'}],
+    [[{'surface': '一', 'base': '一', 'pos': '名詞', 'pos1': '数'}, 
+    {'surface': '\u3000', 'base': '\u3000', 'pos': '記号', 'pos1': '空白'}, 
+    {'surface': '吾輩', 'base': '吾輩', 'pos': '名詞', 'pos1': '代名詞'}, 
+    {'surface': 'は', 'base': 'は', 'pos': '助詞', 'pos1': '係助詞'}, 
+    {'surface': '猫', 'base': '猫', 'pos': '名詞', 'pos1': '一般'}, 
+    {'surface': 'で', 'base': 'だ', 'pos': '助動詞', 'pos1': '*'}, 
+    {'surface': 'ある', 'base': 'ある', 'pos': '助動詞', 'pos1': '*'}, 
+    {'surface': '。', 'base': '。', 'pos': '記号', 'pos1': '句点'}],
     ...
-    ]
+    [{'surface': 'ありがたい', 'base': 'ありがたい', 'pos': '形容詞', 'pos1': '自立'}, 
+    {'surface': 'ありがたい', 'base': 'ありがたい', 'pos': '形容詞', 'pos1': '自立'}, 
+    {'surface': '。', 'base': '。', 'pos': '記号', 'pos1': '句点'}]]
     '''
