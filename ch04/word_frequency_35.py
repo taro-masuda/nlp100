@@ -1,12 +1,7 @@
 import os
 from reading_the_result_30 import load_morpho_dict_list
 
-if __name__ == '__main__':
-    dirpath = './data'
-    resultpath = os.path.join(dirpath, 'neko.txt.mecab')
-
-    doc_dic_list = load_morpho_dict_list(resultpath=resultpath)
-    
+def freq_count(doc_dic_list: list) -> list:
     freq_dic = {}
     for sentence_dic_list in doc_dic_list:
         for word_dic in sentence_dic_list:
@@ -15,6 +10,16 @@ if __name__ == '__main__':
 
     freq_list = [(freq, word) for word, freq in freq_dic.items()]
     freq_list = sorted(freq_list, reverse=True)
+    return freq_list
+
+if __name__ == '__main__':
+    dirpath = './data'
+    resultpath = os.path.join(dirpath, 'neko.txt.mecab')
+
+    doc_dic_list = load_morpho_dict_list(resultpath=resultpath)
+    
+    freq_list = freq_count(doc_dic_list)
+    
 
     for (freq, word) in freq_list[:20]:
         print(freq, word)
@@ -41,7 +46,6 @@ if __name__ == '__main__':
     2191 *
     2090 で
     2042 から
-
     1 あっけない
     1 あたし
     1 あたう
