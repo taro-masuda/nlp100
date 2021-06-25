@@ -1,3 +1,58 @@
+import sentencepiece as spm
+import os
+
+def tokenize(sp: spm.SentencePieceProcessor,
+    filepath_in: str, filepath_out: str) -> None:
+    with open(file=filepath_in, mode='r') as f_in:
+        with open(file=filepath_out, mode='w') as f_out:
+            doc_in = f_in.read()
+            doc_in_lines = doc_in.split('\n')
+            for doc_in_line in doc_in_lines:
+                line = sp.EncodeAsPieces(str(doc_in_line))
+                line = ' '.join(line)
+                f_out.write(line + '\n')
+
+if __name__ == '__main__':
+    pass
+    '''
+    sp = spm.SentencePieceProcessor()
+    #spm.SentencePieceTrainer.Train('--input=data/kftt-data-1.0/data/train.enja --model_prefix=spm_trained_model --vocab_size=16000')
+    sp.load('spm_trained_model.model')
+
+    dirpath = './data/kftt-data-1.0/data/tok/'
+    tokenize(sp,
+        os.path.join(dirpath, 'kyoto-train.en'),
+        os.path.join(dirpath, 'kyoto-train.en.atok')
+    )
+    tokenize(sp,
+        os.path.join(dirpath, 'kyoto-train.ja'),
+        os.path.join(dirpath, 'kyoto-train.ja.atok')
+    )
+    tokenize(sp,
+        os.path.join(dirpath, 'kyoto-dev.en'),
+        os.path.join(dirpath, 'kyoto-dev.en.atok')
+    )
+    tokenize(sp,
+        os.path.join(dirpath, 'kyoto-dev.ja'),
+        os.path.join(dirpath, 'kyoto-dev.ja.atok')
+    )
+    tokenize(sp,
+        os.path.join(dirpath, 'kyoto-tune.en'),
+        os.path.join(dirpath, 'kyoto-tune.en.atok')
+    )
+    tokenize(sp,
+        os.path.join(dirpath, 'kyoto-tune.ja'),
+        os.path.join(dirpath, 'kyoto-tune.ja.atok')
+    )
+    tokenize(sp,
+        os.path.join(dirpath, 'kyoto-test.en'),
+        os.path.join(dirpath, 'kyoto-test.en.atok')
+    )
+    tokenize(sp,
+        os.path.join(dirpath, 'kyoto-test.ja'),
+        os.path.join(dirpath, 'kyoto-test.ja.atok')
+    )
+    '''
 '''
 import os
 from janome.tokenizer import Token, Tokenizer
