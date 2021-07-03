@@ -13,7 +13,7 @@ if __name__ == "__main__":
     x_train = torch.load(train_path)
 
     net = Net(in_shape=x_train.shape[1], out_shape=4)
-    y_pred = net.forward(x_train)
+    y_pred = net(x_train)
 
     train_label_path = os.path.join(filedir_in, 'train_label.pt')
     y_label = torch.load(train_label_path)

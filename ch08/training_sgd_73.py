@@ -28,7 +28,7 @@ if __name__ == "__main__":
     for epoch in range(100):
         optimizer.zero_grad()
 
-        y_pred = net.forward(x_train)
+        y_pred = net(x_train)
         loss = criterion(y_pred, y_label)
         loss.backward()
         optimizer.step()

@@ -105,12 +105,12 @@ def train(BATCH_SIZE=None, EPOCH=None):
         for _ , (x_tr, y_tr) in enumerate(dataloader):
             optimizer.zero_grad()
 
-            y_pred = net.forward(x_tr)
+            y_pred = net(x_tr)
             loss = criterion(y_pred, y_tr)
             loss.backward()
             optimizer.step()
 
-        y_pred = net.forward(x_train)
+        y_pred = net(x_train)
         loss = criterion(y_pred, y_tr_label)
         tr_loss.append(loss.item())
         acc = calc_acc(y_pred, y_tr_label)
@@ -135,7 +135,7 @@ def train(BATCH_SIZE=None, EPOCH=None):
 
         '''
         
-        y_pred = net.forward(x_val)
+        y_pred = net(x_val)
         loss = criterion(y_pred, y_val_label)
         val_loss.append(loss.item())
         acc = calc_acc(y_pred, y_val_label)
@@ -148,7 +148,8 @@ def train(BATCH_SIZE=None, EPOCH=None):
             plt.subplot(2,1,2)
             plt.scatter(epoch, acc, color='red', label='val')
 
-            # print(tr_loss[-1], tr_acc[-1], val_loss[-1], val_acc[-1])
+    print('tr_loss: {}, tr_acc: {}, val_loss: {}, val_acc: {}'.format( 
+        tr_loss[-1], tr_acc[-1], val_loss[-1], val_acc[-1]))
 
     print('Time per epoch:', 
         '{:.4f}[s]'.format((time.time() - start_time)/EPOCH),

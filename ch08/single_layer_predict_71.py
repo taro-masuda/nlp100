@@ -35,7 +35,7 @@ if __name__ == "__main__":
     
     assert torch.equal(net.fc(torch.zeros_like(x_train)) \
         , torch.zeros(x_train.shape[0], 4))
-    output = net.forward(x_train)
+    output = net(x_train)
 
     print(output[0, :])
     print(output[0:4, :])

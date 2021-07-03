@@ -54,7 +54,7 @@ if __name__ == "__main__":
     for epoch in range(100):
         optimizer.zero_grad()
 
-        y_pred = net.forward(x_train)
+        y_pred = net(x_train)
         loss = criterion(y_pred, y_tr_label)
         loss.backward()
         optimizer.step()
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         plt.subplot(2,1,2)
         plt.scatter(epoch, acc, color='blue', label='tr')
         
-        y_pred = net.forward(x_val)
+        y_pred = net(x_val)
         loss = criterion(y_pred, y_val_label)
         val_loss.append(loss.item())
         acc = calc_acc(y_pred, y_val_label)
