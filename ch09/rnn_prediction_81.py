@@ -102,7 +102,7 @@ if __name__ == '__main__':
             hidden_size=hidden_size,
             output_size=output_size,
             n_vocab=len(dic))
-    output, h_T = net.forward(x_train, h_0=torch.zeros(1, batch_size, hidden_size))
+    output, h_T = net(x_train, h_0=torch.zeros(1, batch_size, hidden_size))
     print(output.shape)
     print(output[-1, 0, :])
     '''

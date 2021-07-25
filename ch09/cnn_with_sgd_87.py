@@ -134,7 +134,7 @@ def train(config: dict):
             y_tr = y_tr.reshape([config['batch_size'], config['output_size']])
             #print(y_tr.shape)
             optimizer.zero_grad()
-            output = net.forward(x=x_tr).to(device)
+            output = net(x=x_tr).to(device)
             y_pred = output
             y_pred = y_pred.reshape([config['batch_size'], config['output_size']])
             loss = criterion(y_pred, y_tr)
@@ -143,13 +143,13 @@ def train(config: dict):
             loss.backward()
             optimizer.step()
 
-        output = net.forward(x_train).to(device)
+        output = net(x_train).to(device)
         y_pred = output
         loss = criterion(y_pred, y_tr_label)
         tr_loss = loss.item()
         tr_acc = calc_acc(y_pred, y_tr_label)
 
-        output = net.forward(x=x_val).to(device)
+        output = net(x=x_val).to(device)
         y_pred = output
         loss = criterion(y_pred, y_val_label)
         val_loss = loss.item()

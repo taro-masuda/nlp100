@@ -60,7 +60,7 @@ def train(config: dict):
     for epoch in range(config['epoch']):
         optimizer.zero_grad()
 
-        output, h_T = net.forward(x=x_train, h_0=torch.zeros(1, batch_size, hidden_size))
+        output, h_T = net(x=x_train, h_0=torch.zeros(1, batch_size, hidden_size))
         y_pred = output[-1, :, :]
         loss = criterion(y_pred, y_tr_label)
         tr_loss = loss.item()
@@ -68,7 +68,7 @@ def train(config: dict):
         loss.backward()
         optimizer.step()
 
-        output, h_T = net.forward(x=x_val, h_0=torch.zeros(1, batch_size_val, hidden_size))
+        output, h_T = net(x=x_val, h_0=torch.zeros(1, batch_size_val, hidden_size))
         y_pred = output[-1, :, :]
         loss = criterion(y_pred, y_val_label)
         val_loss = loss.item()

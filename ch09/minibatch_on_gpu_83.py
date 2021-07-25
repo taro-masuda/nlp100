@@ -78,7 +78,7 @@ def train(config: dict):
         for x_tr, y_tr in dataloader:
             optimizer.zero_grad()
             x_tr = x_tr.permute(1, 0)
-            output, h_T = net.forward(x=x_tr, h_0=torch.zeros(1, x_tr.shape[1], hidden_size).to(device))
+            output, h_T = net(x=x_tr, h_0=torch.zeros(1, x_tr.shape[1], hidden_size).to(device))
             y_pred = output[-1, :, :]
             loss = criterion(y_pred, y_tr)
             tr_loss = loss.item()
@@ -86,13 +86,13 @@ def train(config: dict):
             loss.backward()
             optimizer.step()
 
-        output, h_T = net.forward(x_train, h_0=torch.zeros(1, x_train.shape[1], hidden_size).to(device))
+        output, h_T = net(x_train, h_0=torch.zeros(1, x_train.shape[1], hidden_size).to(device))
         y_pred = output[-1, :, :]
         loss = criterion(y_pred, y_tr_label)
         tr_loss = loss.item()
         tr_acc = calc_acc(y_pred, y_tr_label)
 
-        output, h_T = net.forward(x=x_val, h_0=torch.zeros(1, batch_size_val, hidden_size).to(device))
+        output, h_T = net(x=x_val, h_0=torch.zeros(1, batch_size_val, hidden_size).to(device))
         y_pred = output[-1, :, :]
         loss = criterion(y_pred, y_val_label)
         val_loss = loss.item()

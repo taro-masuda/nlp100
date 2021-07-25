@@ -122,7 +122,7 @@ def predict(config: dict):
                 output_size=config['output_size'],
                 seq_len=x_train.shape[2]).to(device)
 
-    output = net.forward(x_train).to(device)
+    output = net(x_train).to(device)
     y_pred = output
     print(y_pred[:5, :])
 
