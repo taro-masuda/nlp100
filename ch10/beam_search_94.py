@@ -12,7 +12,7 @@ if __name__ == "__main__":
     plt.ylabel('BLEU score')
 
     for beam_len in range(1, 100+1):
-        hypopath = 'data/run/pred_1000_beam_' + str(beam_len) + '.txt'
+        hypopath = 'data/run/pred_1500_beam_' + str(beam_len) + '.txt'
         hypo = append_lines(path=hypopath, mode='hypo')
         score = corpus_bleu(ref, hypo)
         print('Corpus BLEU score:', score)

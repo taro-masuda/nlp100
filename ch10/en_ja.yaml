@@ -6,7 +6,32 @@ save_data: data/run/example
 src_vocab: data/run/example.vocab.src
 tgt_vocab: data/run/example.vocab.tgt
 # Prevent overwriting existing files in the folder
-overwrite: False
+overwrite: True
+
+# model type
+decoder_type: transformer
+encoder_type: transformer
+word_vec_size: 512
+rnn_size: 512
+layers: 3
+transformer_ff: 2048
+heads: 4
+
+# optimization
+accum_count: 8
+optim: adam
+adam_beta1: 0.9
+adam_beta2: 0.998
+decay_method: noam
+learning_rate: 2.0
+max_grad_norm: 0.0
+
+# other config on model
+batch_size: 4096
+batch_type: tokens
+normalization: tokens
+dropout: 0.1
+label_smoothing: 0.1
 
 # Corpus opts:
 data:
@@ -28,5 +53,7 @@ gpu_ranks: [0]
 # Where to save the checkpoints
 save_model: data/run/en_ja_model
 save_checkpoint_steps: 500
-train_steps: 1000
-valid_steps: 500
+train_steps: 5000
+valid_steps: 1000
+report_every: 100
+

@@ -16,11 +16,11 @@ def append_lines(path: str, mode: str) -> list:
 
 if __name__ == "__main__":
 
-    hypopath = 'data/run/pred_1000.txt'
+    hypopath = 'data/run/pred_5000.txt'
     refpath = 'data/kftt-data-1.0/data/tok/kyoto-test.ja'
 
     hypo = append_lines(path=hypopath, mode='hypo')
     ref = append_lines(path=refpath, mode='ref')
 
     print('Corpus BLEU score:', corpus_bleu(ref, hypo))
-    # Corpus BLEU score: 0.01513019512226027
+    # Corpus BLEU score: 0.121311235142337
