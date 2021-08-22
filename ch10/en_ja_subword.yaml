@@ -33,14 +33,30 @@ normalization: tokens
 dropout: 0.1
 label_smoothing: 0.1
 
+# subword options
+src_subword_type: sentencepiece
+src_subword_model: examples/subword.spm.model
+tgt_subword_type: sentencepiece
+tgt_subword_model: examples/subword.spm.model
+
+# Number of candidates for SentencePiece sampling
+subword_nbest: 20
+# Smoothing parameter for SentencePiece sampling
+subword_alpha: 0.1
+# specific arguments for pyonmttok
+src_onmttok_kwargs: '{"mode": "none", "spacer_annotate": True}'
+tgt_onmttok_kwargs: '{"mode": "none", "spacer_annotate": True}'
+
 # Corpus opts:
 data:
     corpus_1:
         path_src: data/kftt-data-1.0/data/tok/kyoto-train.en
         path_tgt: data/kftt-data-1.0/data/tok/kyoto-train.ja
+        transforms: [onmt_tokenize]
     valid:
         path_src: data/kftt-data-1.0/data/tok/kyoto-dev.en
         path_tgt: data/kftt-data-1.0/data/tok/kyoto-dev.ja
+        transforms: [onmt_tokenize]
 
 # Vocabulary files that were just created
 src_vocab: data/run/example.vocab.src
@@ -56,3 +72,4 @@ save_checkpoint_steps: 500
 train_steps: 5000
 valid_steps: 1000
 report_every: 100
+
